@@ -7,8 +7,8 @@ public class Scheduler implements IScheduler {
 	private BlockingPriorityQueue queue;
 	private Vector stateMachines;
 
-	public Scheduler(int maxPriority) {
-		queue = new BlockingPriorityQueue(maxPriority);
+	public Scheduler(int maxPriority, double fairness) {
+		queue = new BlockingPriorityQueue(maxPriority, fairness);
 	}
 
 	public void run() {
