@@ -10,11 +10,9 @@ public class MessageEvent extends Event {
 
     /**
      *
-     * @param stateMachine is the state machine to which the message should be sent
      * @param message is the message that's being sent
      */
-    public MessageEvent(IStateMachine stateMachine, Message message){
-        super(stateMachine);
+    public MessageEvent(Message message){
         this.message = message;
     }
 

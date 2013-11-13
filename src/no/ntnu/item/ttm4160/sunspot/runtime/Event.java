@@ -2,11 +2,6 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 
 public abstract class Event {
 	
-	/**
-	 * The state machine which should handle this event
-	 */
-    private IStateMachine addressStateMachine;
-
     /**
      * Whether this event should be executed upon pop'ing from the queue
      */
@@ -14,19 +9,9 @@ public abstract class Event {
 
     /**
      * Construct a new event
-     * @param addressStateMachine	The state machine which should handle this event
      */
-    public Event(IStateMachine addressStateMachine){
-        this.addressStateMachine = addressStateMachine;
+    public Event(){
         alive = true;
-    }
-
-    /**
-     * Returns the state machine which should handle this event
-     * @return	the state machine
-     */
-    public IStateMachine getMachine(){
-        return addressStateMachine;
     }
 
     /**
