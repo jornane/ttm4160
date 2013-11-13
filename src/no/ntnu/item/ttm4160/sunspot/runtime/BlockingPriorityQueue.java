@@ -55,7 +55,7 @@ public class BlockingPriorityQueue {
 	public synchronized Object peek() {
 		for(int i=getMaxPriority();i>=0;i--) {
 			double number = random.nextDouble();
-			if (!queue[i].empty() || number >= fairness)
+			if (!queue[i].empty() && number >= fairness)
 				return queue[i].pop();
 		}
 		return null;
