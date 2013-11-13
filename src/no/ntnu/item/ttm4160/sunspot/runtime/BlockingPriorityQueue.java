@@ -10,6 +10,13 @@ public class BlockingPriorityQueue {
 	private final Random random = new Random();
 	
 	/**
+	 * Construct a new queue with no fairness implemented
+	 * @param maxPriority	the maximum priority an object can be given
+	 */
+	public BlockingPriorityQueue(int maxPriority) {
+		this(maxPriority, 0);
+	}
+	/**
 	 * Construct a new queue
 	 * @param maxPriority	the maximum priority an object can be given
 	 * @param fairness	Chance that a task with a lower priority gets scheduled,
