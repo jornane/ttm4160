@@ -1,23 +1,33 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
-import no.ntnu.item.ttm4160.sunspot.communication.Message;
-
-
-public class Event {
-    public Message message;
+public abstract class Event {
+	
+	/**
+	 * The state machine which should handle this event
+	 */
     private IStateMachine addressStateMachine;
-    private boolean alive;
 
-    public Event(Message message, IStateMachine addressStateMachine){
-        this.message = message;
+    /**
+     * Construct a new event
+     * @param addressStateMachine	The state machine which should handle this event
+     */
+    public Event(IStateMachine addressStateMachine){
         this.addressStateMachine = addressStateMachine;
-        alive = true;
     }
+
+    /**
+     * Returns the state machine which should handle this event
+     * @return	the statemachine
+     */
     public IStateMachine getMachine(){
         return addressStateMachine;
     }
-    public boolean isAlive(){
-        return alive;
-    }
+
+    /**
+     * Returns whether this event is still relevant.
+     * Non-alive events should be ignored.
+     * @return	whether the event is still alive.
+     */
+    public abstract boolean isAlive();
 
 }
