@@ -34,11 +34,14 @@ public class Scheduler implements IScheduler {
 		}
 	}
 
-	public Vector getMachinesForString(String machine) {
-		Vector result = new Vector();
+	public IStateMachine[] getMachinesForString(String machine) {
+		Vector machines = new Vector();
 		for(int i=0;i<stateMachines.size();i++)
 			if (((IStateMachine)stateMachines.elementAt(i)).answersTo(machine))
-				result.addElement(stateMachines.elementAt(i));
+				machines.addElement(stateMachines.elementAt(i));
+		IStateMachine[] result = new IStateMachine[machines.size()];
+		for(int i=0;i<result.length;i++)
+			result[i] = (IStateMachine) machines.elementAt(i);
 		return result;
 	}
 

@@ -4,6 +4,6 @@ import java.util.Vector;
 
 public interface IScheduler extends Runnable {
 
-	Vector getMachinesForString(String machine);
+	IStateMachine[] getMachinesForString(String machine);
 
 }
