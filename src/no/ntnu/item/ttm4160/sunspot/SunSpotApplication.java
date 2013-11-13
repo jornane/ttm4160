@@ -26,6 +26,8 @@ package no.ntnu.item.ttm4160.sunspot;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import no.ntnu.item.ttm4160.example.Receiver;
+import no.ntnu.item.ttm4160.example.Transmitter;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 
 import com.sun.spot.peripheral.Spot;
@@ -43,6 +45,8 @@ import com.sun.spot.util.IEEEAddress;
 public class SunSpotApplication extends MIDlet {
 	
 	Scheduler scheduler;
+	private Transmitter transmitter;
+	private Receiver receiver;
 	
 	
     protected void startApp() throws MIDletStateChangeException {
@@ -50,6 +54,9 @@ public class SunSpotApplication extends MIDlet {
         new BootloaderListener().start();   // monitor the USB (if connected) and recognize commands from host
         // So you don't have to reset SPOT to deploy new code on it.
 
+        scheduler = new Scheduler(1, .1);
+        transmitter = new Transmitter();
+        receiver = new Receiver();
         /*
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
