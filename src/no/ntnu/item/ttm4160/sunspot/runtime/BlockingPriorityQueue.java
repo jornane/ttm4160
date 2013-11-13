@@ -4,15 +4,17 @@ import java.util.Stack;
 
 public class BlockingPriorityQueue {
 
-	private Stack[] queue;
+	private final Stack[] queue;
 	
 	/**
 	 * Construct a new queue
 	 * @param maxPriority	the maximum priority an object can be given
 	 */
 	public BlockingPriorityQueue(int maxPriority) {
-		// assert maxPriority > 0;
-		queue = new Stack[maxPriority];
+		// assert maxPriority >= 0;
+		queue = new Stack[maxPriority+1];
+		for(int i=0;i<queue.length;i++)
+			queue[i] = new Stack();
 	}
 	
 	/**
@@ -38,7 +40,7 @@ public class BlockingPriorityQueue {
 	 * @return the next object from the queue
 	 */
 	public synchronized Object peek() {
-		for(int i=0;i<queue.length;i++)
+		for(int i=getMaxPriority();i>=0;i--)
 			if (!queue[i].empty())
 				return queue[i].pop();
 		return null;
@@ -53,6 +55,15 @@ public class BlockingPriorityQueue {
 	public void push(Object obj, int priority) {
 		queue[priority].addElement(obj);
 		notifyAll();
+	}
+	
+	/**
+	 * Get the maximum priority.
+	 * This is the highest valid value for a priority argument in any function.
+	 * @return	the maximum priority
+	 */
+	public int getMaxPriority() {
+		return queue.length-1;
 	}
 	
 }
