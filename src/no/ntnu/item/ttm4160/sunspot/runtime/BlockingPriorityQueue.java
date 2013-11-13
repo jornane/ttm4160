@@ -81,4 +81,12 @@ public class BlockingPriorityQueue {
 		return queue.length-1;
 	}
 	
+	/**
+	 * Make the queue empty.
+	 */
+	public void clear() {
+		for(int i=0;i<queue.length;i++)
+			queue[i].removeAllElements();
+	}
+	
 }
