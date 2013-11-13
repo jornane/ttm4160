@@ -11,11 +11,9 @@ import no.ntnu.item.ttm4160.sunspot.communication.Message;
  */
 public class Event {
     public Message message;
-    public IStateMachine addressStateMachine;
 
     public Event(Message message, IStateMachine addressStateMachine){
         this.message = message;
-        this.addressStateMachine = addressStateMachine;
     }
 
 }
