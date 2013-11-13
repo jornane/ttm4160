@@ -1,20 +1,26 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
+import java.util.Random;
 import java.util.Stack;
 
 public class BlockingPriorityQueue {
 
 	private final Stack[] queue;
+	private final double fairness;
+	private final Random random = new Random();
 	
 	/**
 	 * Construct a new queue
 	 * @param maxPriority	the maximum priority an object can be given
+	 * @param fairness	Chance that a task with a lower priority gets scheduled,
+	 * 		even though higher priorities are available
 	 */
-	public BlockingPriorityQueue(int maxPriority) {
+	public BlockingPriorityQueue(int maxPriority, double fairness) {
 		// assert maxPriority >= 0;
 		queue = new Stack[maxPriority+1];
 		for(int i=0;i<queue.length;i++)
 			queue[i] = new Stack();
+		this.fairness = fairness;
 	}
 	
 	/**
@@ -40,9 +46,11 @@ public class BlockingPriorityQueue {
 	 * @return the next object from the queue
 	 */
 	public synchronized Object peek() {
-		for(int i=getMaxPriority();i>=0;i--)
-			if (!queue[i].empty())
+		for(int i=getMaxPriority();i>=0;i--) {
+			double number = random.nextDouble();
+			if (!queue[i].empty() || number > fairness)
 				return queue[i].pop();
+		}
 		return null;
 	}
 
