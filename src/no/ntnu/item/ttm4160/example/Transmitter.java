@@ -3,6 +3,8 @@
  */
 package no.ntnu.item.ttm4160.example;
 
+import com.sun.spot.sensorboard.peripheral.LEDColor;
+
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
@@ -65,13 +67,15 @@ public class Transmitter extends StateMachine {
     private void fireOnInit(Event event, Scheduler scheduler) {
 		scheduler.subscribe(this, new SwitchEventType(1));
 		scheduler.subscribe(this, new SwitchEventType(2));
-		scheduler.subscribe(this, new MessageEventType(this.toString()));
+		scheduler.subscribe(this, new MessageEventType(this.getName()));
 		scheduler.subscribe(this, new TimerEventType(this));
 	}
 	private Action fireOnStateReady(Event event, Scheduler scheduler){
         if (event instanceof SwitchEvent /*Needs check for right button*/){
             startTimer(scheduler, 500);
+            Scheduler.debug(0, LEDColor.WHITE);
             super.sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
+            Scheduler.debug(1, LEDColor.WHITE);
             state = State.WAIT_RESPONSE;
             return Action.EXECUTE_TRANSITION;
         }
@@ -79,11 +83,17 @@ public class Transmitter extends StateMachine {
 
     }
     private Action fireOnStateWaitResponse(Event event, Scheduler scheduler){
+    	Scheduler.debug(0, LEDColor.RED);
         if(event instanceof MessageEvent){
+            Scheduler.debug(4, LEDColor.RED);
+
             if(((MessageEvent) event).message.getContent().equals(Message.ICanDisplayReadings)){
-                super.sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
+            	Scheduler.debug(1, LEDColor.RED);
+            	super.sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
                 startTimer(scheduler, 100);
+                
                 lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
+                Scheduler.debug(2, LEDColor.RED);
                 state = State.SENDING;
                 return Action.EXECUTE_TRANSITION;
             }
