@@ -4,24 +4,25 @@ import no.ntnu.item.ttm4160.sunspot.communication.Message;
 
 public class MessageEventType implements IEventType {
 
-	public final static IEventType BROADCAST = new MessageEventType();
+	public final static IEventType BROADCAST = new MessageEventType(Message.BROADCAST_ADDRESS);
 	
-	public final String sender;
+	public final String receiver;
 
-	private MessageEventType() {
-		this.sender = null;
-	}
-	
-	public MessageEventType(String sender) {
-		this.sender = sender;
+	/**
+	 * Construct a new MessageEvent Type.
+	 * It will match on a receiver.
+	 * 
+	 * @param receiver	the receiver
+	 */
+	public MessageEventType(String receiver) {
+		if (receiver == null)
+			throw new NullPointerException();
+		this.receiver = receiver;
 	}
 
 	public boolean isInterestedIn(Event event) {
-		Message message = ((MessageEvent)event).message;
-		return event instanceof MessageEvent && this == BROADCAST
-				? Message.BROADCAST_ADDRESS.equals(message.getReceiver())
-				: sender.equals(message.getSender())
-				;
+		return event instanceof MessageEvent
+				&& receiver.equals(((MessageEvent)event).message.getReceiver());
 	}
 
 }
