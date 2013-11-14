@@ -3,6 +3,10 @@
  */
 package no.ntnu.item.ttm4160.example;
 
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.ITriColorLED;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
+import com.sun.spot.util.Utils;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
@@ -89,7 +93,7 @@ public class Transmitter extends StateMachine {
             }
         }
         else if(event instanceof TimerEvent){
-            blinkLeds();
+            blink();
             state = State.READY;
             return Action.EXECUTE_TRANSITION;
         }
@@ -119,12 +123,24 @@ public class Transmitter extends StateMachine {
 
     private void sendLightReadings(Scheduler scheduler) {
         //TODO get LightReadings
-        String lightReadings = "-1";
-        super.sendMessage(scheduler, lightReadingsReceiver, lightReadings);
+        String lightReadings = "400";
+
+        super.sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
     }
 
-    private void blinkLeds() {
-        //TODO make led blinking method
+    private void blink() {
+        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
+        for(int j=0;j<4;j++) {
+            for (int i = 0; i < 8; i++) {
+                leds[i].setColor(LEDColor.WHITE);
+                leds[i].setOn(i%2==0);
+            }
+            Utils.sleep(200);
+            for (int i = 0; i < 8; i++) {
+                leds[i].setOn(i%2!=0);
+            }
+            Utils.sleep(200);
+        }
     }
 
     private void startTimer(Scheduler scheduler, long delay) {
