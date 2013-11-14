@@ -42,7 +42,7 @@ public class Transmitter extends StateMachine {
     /* (non-Javadoc)
      * @see no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine#fire(no.ntnu.item.ttm4160.sunspot.runtime.Event, no.ntnu.item.ttm4160.sunspot.runtime.Scheduler)
      */
-	public EAction fire(Event event, Scheduler scheduler) {
+	public Action fire(Event event, Scheduler scheduler) {
 
         if(state.toString().equals("READY")){
             fireOnStateReady(event, scheduler);
@@ -56,75 +56,69 @@ public class Transmitter extends StateMachine {
 
 
         if(event instanceof MessageEvent&& ((MessageEvent)event).message.getContent().equals(Message.CanYouDisplayMyReadings)){
-            sendMessage(((MessageEvent) event).message.getReceiver(), Message.Denied);
-            return EAction.EXECUTE_TRANSITION;
+            super.sendMessage(scheduler, ((MessageEvent) event).message.getReceiver(), Message.Denied);
+            return Action.EXECUTE_TRANSITION;
 
         }
-		return EAction.DISCARD_EVENT;
+		return Action.DISCARD_EVENT;
 	}
-    private EAction fireOnStateReady(Event event, Scheduler scheduler){
+    private Action fireOnStateReady(Event event, Scheduler scheduler){
         if (event instanceof SwitchEvent /*Needs check for right button*/){
             startTimer(500);
-            sendMessage(Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
+            super.sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
             state = State.WAIT_RESPONSE;
-            return EAction.EXECUTE_TRANSITION;
+            return Action.EXECUTE_TRANSITION;
         }
-        return EAction.DISCARD_EVENT;
+        return Action.DISCARD_EVENT;
 
     }
-    private EAction fireOnStateWaitResponse(Event event, Scheduler scheduler){
+    private Action fireOnStateWaitResponse(Event event, Scheduler scheduler){
         if(event instanceof MessageEvent){
             if(((MessageEvent) event).message.getContent().equals(Message.ICanDisplayReadings)){
-                sendMessage(((MessageEvent) event).message.getSender(), Message.Approved);
+                super.sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
                 startTimer(100);
                 lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
                 state = State.SENDING;
-                return EAction.EXECUTE_TRANSITION;
+                return Action.EXECUTE_TRANSITION;
             }
         }
         else if(event instanceof TimerEvent){
             blinkLeds();
             state = State.READY;
-            return EAction.EXECUTE_TRANSITION;
+            return Action.EXECUTE_TRANSITION;
         }
-        return EAction.DISCARD_EVENT;
+        return Action.DISCARD_EVENT;
     }
-    private EAction fireOnStateSending(Event event, Scheduler scheduler){
+    private Action fireOnStateSending(Event event, Scheduler scheduler){
         if(event instanceof TimerEvent ){
             startTimer(100);
             sendLightReadings();
-            return EAction.EXECUTE_TRANSITION;
+            return Action.EXECUTE_TRANSITION;
         }
-        else if(event instanceof MessageEvent && ((MessageEvent) event).message.equals(Message.ReceiverDisconnect)){
+        else if(event instanceof MessageEvent && ((MessageEvent) event).message.getContent().equals(Message.ReceiverDisconnect)){
             currentTimer.cancel();
             state = State.READY;
-            return EAction.EXECUTE_TRANSITION;
+            return Action.EXECUTE_TRANSITION;
 
         }
         else if(event instanceof SwitchEvent /*TODO check for right button id*/){
-            sendMessage(lightReadingsReceiver, Message.SenderDisconnect);
+            super.sendMessage(scheduler, lightReadingsReceiver, Message.SenderDisconnect);
             currentTimer.cancel();
             state = State.READY;
-            return EAction.EXECUTE_TRANSITION;
+            return Action.EXECUTE_TRANSITION;
 
         }
-        return EAction.DISCARD_EVENT;
+        return Action.DISCARD_EVENT;
     }
 
     private void sendLightReadings() {
         //TODO get LightReadings
         String lightReadings = "-1";
-        sendMessage(lightReadingsReceiver, lightReadings);
+        super.sendMessage(scheduler, lightReadingsReceiver, lightReadings);
     }
 
     private void blinkLeds() {
         //TODO make led blinking method
-    }
-
-    private void sendMessage(String receiver, String content) {
-        Message message = new Message(id, receiver, content);
-        Event event = new MessageEvent(message);
-        //send message
     }
 
     private void startTimer(long delay) {
@@ -132,12 +126,4 @@ public class Transmitter extends StateMachine {
         //start Timer
         this.currentTimer = (TimerEvent)timer;
     }
-
-    /* (non-Javadoc)
-     * @see no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine#answersTo(java.lang.String)
-     */
-	public boolean answersTo(String id) {
-        return this.id.equals(id) || Message.BROADCAST_ADDRESS.equals(id);
-	}
-
 }
