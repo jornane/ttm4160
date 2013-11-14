@@ -19,7 +19,7 @@ public class TimerEvent extends Event {
 		 * Schedules the enclosing event in the scheduler with the highest priority.
 		 */
 		public void run() {
-			scheduler.schedule(event, scheduler.getMaxPriority());
+			scheduler.pushEventHappened(event, scheduler.getMaxPriority());
 			event.cancel(); // ensure the event fires only once
 		}
 		

@@ -73,7 +73,7 @@ public class Scheduler implements IScheduler {
 		return queue.getMaxPriority();
 	}
 	
-	void schedule(Event event, int priority) {
+	void pushEventHappened(Event event, int priority) {
 		queue.push(event, priority);
 	}
 
