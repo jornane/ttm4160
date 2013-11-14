@@ -102,7 +102,7 @@ public class Receiver extends StateMachine {
 				if (Message.SenderDisconnect.equals(messageEvent.message.getContent())) {
 					timer.cancel();
 					timer = null;
-					// blink LEDs
+					blink();
 					state = State.FREE;
 					return Action.EXECUTE_TRANSITION;
 				}
@@ -153,7 +153,7 @@ public class Receiver extends StateMachine {
 		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
 		for(int i=0;i<leds.length;i++) {
 			leds[i].setOff();
-			leds[i].setRGB(255, 255, 255);
+			leds[i].setColor(LEDColor.WHITE);
 		}
 	}
 
