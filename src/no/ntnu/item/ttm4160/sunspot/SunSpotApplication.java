@@ -55,8 +55,9 @@ public class SunSpotApplication extends MIDlet {
         // So you don't have to reset SPOT to deploy new code on it.
 
         scheduler = new Scheduler(1, .1);
-        transmitter = new Transmitter();
-        receiver = new Receiver();
+        scheduler.addMachine(transmitter = new Transmitter());
+        scheduler.addMachine(receiver = new Receiver());
+        scheduler.run();
         /*
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
