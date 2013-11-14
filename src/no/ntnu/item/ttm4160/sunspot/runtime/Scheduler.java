@@ -4,7 +4,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Scheduler implements IScheduler {
+public class Scheduler implements Runnable {
 
 	private final BlockingPriorityQueue queue;
 	private final Vector/*<IStateMachine>*/ stateMachines;
@@ -34,11 +34,11 @@ public class Scheduler implements IScheduler {
 		while(stateMachines.size() > 0) {
 			try {
 				Event event = (Event)queue.next();
-				IStateMachine machine = null;
+				StateMachine machine = null;
 				for(
 						Enumeration e=subscriptions.keys();
 						e.hasMoreElements();
-						machine=(IStateMachine)e.nextElement()
+						machine=(StateMachine)e.nextElement()
 				) {
 					Vector list = (Vector) subscriptions.get(machine);
 					for(int i=0;i<list.size();i++) {
@@ -53,17 +53,17 @@ public class Scheduler implements IScheduler {
 		}
 	}
 
-	public void subscribe(IStateMachine machine, IEventType type) {
+	public void subscribe(StateMachine machine, IEventType type) {
 		if (!subscriptions.containsKey(machine))
 			subscriptions.put(machine, new Vector());
 		((Vector)subscriptions.get(machine)).addElement(type);
 	}
 
-	private void fire(Event event, IStateMachine machine) {
-		EAction action = machine.fire(event, this);
-		if(action==EAction.DISCARD_EVENT) {
+	private void fire(Event event, StateMachine machine) {
+		Action action = machine.fire(event, this);
+		if(action==Action.DISCARD_EVENT) {
 			System.err.println("Discarded Event: "+event);
-		} else if(action==EAction.TERMINATE_SYSTEM) {
+		} else if(action==Action.TERMINATE_SYSTEM) {
 			stateMachines.removeElement(machine);
 			System.err.println("Terminating machine "+machine);
 		}

@@ -12,7 +12,7 @@ import no.ntnu.item.ttm4160.sunspot.runtime.*;
  */
 public class Transmitter extends StateMachine {
 
-    private final Scheduler scheduler;
+    private Scheduler scheduler;
     private State state;
     private String lightReadingsReceiver;
     private TimerEvent currentTimer;
@@ -24,6 +24,10 @@ public class Transmitter extends StateMachine {
         public State SENDING = new State() {public String toString() {return"SENDING";}};
     }
 
+    public Transmitter(){
+        subscribeToButtons();
+        state= State.READY;
+    }
     public Transmitter( Scheduler scheduler){
         this.scheduler = scheduler;
         subscribeToButtons();
