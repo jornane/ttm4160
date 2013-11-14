@@ -19,6 +19,8 @@ import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEventType;
 
+import java.io.IOException;
+
 /**
  * @author yorn
  *
@@ -85,7 +87,7 @@ public class Transmitter extends StateMachine {
     private Action fireOnStateWaitResponse(Event event, Scheduler scheduler){
         if(event instanceof MessageEvent){
             if(((MessageEvent) event).message.getContent().equals(Message.ICanDisplayReadings)){
-                super.sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
+                sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
                 startTimer(scheduler, 100);
                 lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
                 state = State.SENDING;
@@ -124,8 +126,12 @@ public class Transmitter extends StateMachine {
     }
 
     private void sendLightReadings(Scheduler scheduler) {
-        //TODO get LightReadings
-        String lightReadings = "400";
+        int lightReadings = -1;
+        try {
+            lightReadings = EDemoBoard.getInstance().getLightSensor().getAverageValue();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         super.sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
     }
