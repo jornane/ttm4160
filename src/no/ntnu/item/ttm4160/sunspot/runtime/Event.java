@@ -10,7 +10,7 @@ public abstract class Event {
     /**
      * Construct a new event
      */
-    public Event(){
+    public Event() {
         alive = true;
     }
 

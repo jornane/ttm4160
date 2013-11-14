@@ -51,6 +51,20 @@ public class TimerEvent extends Event {
 	}
 	
 	/**
+	 * Convenience function to create a timer and start it.
+	 * 
+	 * @param machine	The state machine to which this Timer is directed
+	 * @param scheduler	The scheduler of machine
+	 * @param delay	The amount of milliseconds to wait until the event fires
+	 * @return	the newly created TimerEvent
+	 */
+	public static TimerEvent schedule(IStateMachine machine, Scheduler scheduler, long delay) {
+		TimerEvent timerEvent = new TimerEvent(machine, scheduler, delay);
+		timerEvent.start();
+		return timerEvent;
+	}
+	
+	/**
 	 * Start the timer,
 	 * it will fire (add schedule itself) after {@link #delay} milliseconds.
 	 * @throws IllegalStateException	if not {@link #isAlive()}
