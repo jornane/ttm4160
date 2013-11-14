@@ -10,9 +10,8 @@ import no.ntnu.item.ttm4160.sunspot.runtime.*;
  * @author yorn
  *
  */
-public class Transmitter implements IStateMachine {
+public class Transmitter extends StateMachine {
 
-    private final String id;
     private final Scheduler scheduler;
     private State state;
     private String lightReadingsReceiver;
@@ -25,12 +24,10 @@ public class Transmitter implements IStateMachine {
         public State SENDING = new State() {public String toString() {return"SENDING";}};
     }
 
-    public Transmitter(String id, Scheduler scheduler){
-        this.id = id;
+    public Transmitter( Scheduler scheduler){
         this.scheduler = scheduler;
         subscribeToButtons();
         state = State.READY;
-
     }
 
     private void subscribeToButtons() {
@@ -62,7 +59,7 @@ public class Transmitter implements IStateMachine {
 		return EAction.DISCARD_EVENT;
 	}
     private EAction fireOnStateReady(Event event, Scheduler scheduler){
-        if (event instanceof SwitchEvent && event.isSwitchNumber(1)){
+        if (event instanceof SwitchEvent /*Needs check for right button*/){
             startTimer(500);
             sendMessage(Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
             state = State.WAIT_RESPONSE;
@@ -123,12 +120,12 @@ public class Transmitter implements IStateMachine {
     private void sendMessage(String receiver, String content) {
         Message message = new Message(id, receiver, content);
         Event event = new MessageEvent(message);
-        scheduler.schedule(event);
+        //send message
     }
 
     private void startTimer(long delay) {
         Event timer = new TimerEvent(this, scheduler, delay);
-        scheduler.schedule(timer);
+        //start Timer
         this.currentTimer = (TimerEvent)timer;
     }
 
