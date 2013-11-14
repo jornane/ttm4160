@@ -30,7 +30,7 @@ public class TimerEvent extends Event {
 	/**
 	 * The state machine to which this Timer is directed.
 	 */
-	public final IStateMachine machine;
+	public final StateMachine machine;
 
 	private final Scheduler scheduler;
 	private final long delay;
@@ -43,7 +43,7 @@ public class TimerEvent extends Event {
 	 * @param scheduler	The scheduler of machine
 	 * @param delay	The amount of milliseconds to wait until the event fires
 	 */
-	public TimerEvent(IStateMachine machine, Scheduler scheduler, long delay) {
+	public TimerEvent(StateMachine machine, Scheduler scheduler, long delay) {
 		this.machine = machine;
 		this.scheduler = scheduler;
 		this.delay = delay;
@@ -58,7 +58,7 @@ public class TimerEvent extends Event {
 	 * @param delay	The amount of milliseconds to wait until the event fires
 	 * @return	the newly created TimerEvent
 	 */
-	public static TimerEvent schedule(IStateMachine machine, Scheduler scheduler, long delay) {
+	public static TimerEvent schedule(StateMachine machine, Scheduler scheduler, long delay) {
 		TimerEvent timerEvent = new TimerEvent(machine, scheduler, delay);
 		timerEvent.start();
 		return timerEvent;
