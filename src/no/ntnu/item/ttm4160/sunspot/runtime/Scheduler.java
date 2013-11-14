@@ -98,8 +98,6 @@ public class Scheduler implements Runnable {
 	 * @param type	the event type the state machine is interested in
 	 */
 	public void subscribe(StateMachine machine, IEventType type) {
-		if (!subscriptions.containsKey(machine))
-			subscriptions.put(machine, new Vector());
 		((Vector)subscriptions.get(machine)).addElement(type);
 	}
 
@@ -134,6 +132,15 @@ public class Scheduler implements Runnable {
 	 */
 	void pushEventHappened(Event event, int priority) {
 		queue.push(event, priority);
+	}
+
+	/**
+	 * Add a state machine
+	 * @param machine	the machine to add
+	 */
+	public void addMachine(StateMachine machine) {
+		stateMachines.addElement(machine);
+		subscriptions.put(machine, new Vector());
 	}
 
 }
