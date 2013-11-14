@@ -76,13 +76,13 @@ public class Receiver extends StateMachine {
 	public Action fireOnWaitApproved(Event event, Scheduler scheduler) {
 		if (event instanceof MessageEvent) {
 			MessageEvent messageEvent = (MessageEvent) event;
-			if (Message.Approved.equals(messageEvent.message)) {
 				timer = TimerEvent.schedule(this, scheduler, 5000);
+			if (Message.Approved.equals(messageEvent.message.getContent())) {
 				prepareLEDsForBusy();
 				state = State.BUSY;
 				return Action.EXECUTE_TRANSITION;
 			}
-			else if (Message.Denied.equals(messageEvent.message)) {
+			else if (Message.Denied.equals(messageEvent.message.getContent())) {
 				state = State.FREE;
 				blink();
 				return Action.EXECUTE_TRANSITION;
