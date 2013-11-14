@@ -4,7 +4,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Scheduler implements IScheduler {
+public class Scheduler implements Runnable {
 
 	private final BlockingPriorityQueue queue;
 	private final Vector/*<IStateMachine>*/ stateMachines;
