@@ -101,7 +101,9 @@ public class Transmitter extends StateMachine {
     }
     private Action fireOnStateSending(Event event, Scheduler scheduler){
         if(event instanceof TimerEvent ){
-            startTimer(scheduler, 100);
+            TimerEvent timer = new TimerEvent(this, scheduler,100);
+            timer.start();
+            currentTimer = timer;
             sendLightReadings(scheduler);
             return Action.EXECUTE_TRANSITION;
         }
