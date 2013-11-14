@@ -49,7 +49,7 @@ public class Receiver extends StateMachine {
 	public Action fireOnInit(Event event, Scheduler scheduler) {
 			scheduler.subscribe(this, new SwitchEventType(2));
 			scheduler.subscribe(this, MessageEventType.BROADCAST);
-			scheduler.subscribe(this, new MessageEventType(this.toString()));
+			scheduler.subscribe(this, new MessageEventType(this.getName()));
 			scheduler.subscribe(this, new TimerEventType(this));
 			state = State.FREE;
 			return Action.EXECUTE_TRANSITION;
@@ -59,9 +59,10 @@ public class Receiver extends StateMachine {
 			if (event instanceof MessageEvent) {
 				MessageEvent messageEvent = (MessageEvent) event;
 				if (Message.BROADCAST_ADDRESS.equals(messageEvent.message.getReceiver())) {
+					otherSpot = messageEvent.message.getSender();
 					sendMessage(
 							scheduler, 
-							messageEvent.message.getSender(), 
+							otherSpot, 
 							Message.ICanDisplayReadings
 						);
 					
@@ -76,7 +77,6 @@ public class Receiver extends StateMachine {
 		if (event instanceof MessageEvent) {
 			MessageEvent messageEvent = (MessageEvent) event;
 			if (Message.Approved.equals(messageEvent.message)) {
-				otherSpot = messageEvent.message.getSender();
 				timer = TimerEvent.schedule(this, scheduler, 5000);
 				prepareLEDsForBusy();
 				state = State.BUSY;
@@ -84,6 +84,7 @@ public class Receiver extends StateMachine {
 			}
 			else if (Message.Denied.equals(messageEvent.message)) {
 				state = State.FREE;
+				blink();
 				return Action.EXECUTE_TRANSITION;
 			}
 		}
@@ -102,7 +103,7 @@ public class Receiver extends StateMachine {
 				if (Message.SenderDisconnect.equals(messageEvent.message.getContent())) {
 					timer.cancel();
 					timer = null;
-					// blink LEDs
+					blink();
 					state = State.FREE;
 					return Action.EXECUTE_TRANSITION;
 				}
@@ -153,7 +154,7 @@ public class Receiver extends StateMachine {
 		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
 		for(int i=0;i<leds.length;i++) {
 			leds[i].setOff();
-			leds[i].setRGB(255, 255, 255);
+			leds[i].setColor(LEDColor.WHITE);
 		}
 	}
 
