@@ -75,8 +75,8 @@ public class Transmitter extends StateMachine {
 		scheduler.subscribe(this, new TimerEventType(this));
 	}
 	private Action fireOnStateReady(Event event, Scheduler scheduler){
-        if (event instanceof SwitchEvent /*Needs check for right button*/){
-            TimerEvent timer = new TimerEvent(this, scheduler, 500);
+        if (event instanceof SwitchEvent && ((SwitchEvent)event).button == 1){
+            TimerEvent timer = TimerEvent.schedule(this, scheduler, 500);
             currentTimer = timer;
             sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
             state = State.WAIT_RESPONSE;
@@ -89,8 +89,9 @@ public class Transmitter extends StateMachine {
         if(event instanceof MessageEvent){
             if(((MessageEvent) event).message.getContent().equals(Message.ICanDisplayReadings)){
                 sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
-                TimerEvent timer = new TimerEvent(this, scheduler, 100);
-                currentTimer = timer;
+                if (currentTimer != null)
+                	currentTimer.cancel();
+                currentTimer = TimerEvent.schedule(this, scheduler, 100);
                 lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
                 state = State.SENDING;
                 return Action.EXECUTE_TRANSITION;
@@ -105,9 +106,9 @@ public class Transmitter extends StateMachine {
     }
     private Action fireOnStateSending(Event event, Scheduler scheduler){
         if(event instanceof TimerEvent ){
-            TimerEvent timer = new TimerEvent(this, scheduler,100);
-            timer.start();
-            currentTimer = timer;
+            if (currentTimer != null)
+            	currentTimer.cancel();
+            currentTimer = TimerEvent.schedule(this, scheduler,100);;
             sendLightReadings(scheduler);
             return Action.EXECUTE_TRANSITION;
         }
@@ -117,7 +118,7 @@ public class Transmitter extends StateMachine {
             return Action.EXECUTE_TRANSITION;
 
         }
-        else if(event instanceof SwitchEvent /*TODO check for right button id*/){
+        else if(event instanceof SwitchEvent && ((SwitchEvent)event).button == 2){
             sendMessage(scheduler, lightReadingsReceiver, Message.SenderDisconnect);
             currentTimer.cancel();
             state = State.READY;
