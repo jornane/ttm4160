@@ -29,11 +29,9 @@ import javax.microedition.midlet.MIDletStateChangeException;
 import no.ntnu.item.ttm4160.example.Receiver;
 import no.ntnu.item.ttm4160.example.Transmitter;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
 
-import com.sun.spot.peripheral.Spot;
-import com.sun.spot.sensorboard.peripheral.LightSensor;
 import com.sun.spot.util.BootloaderListener;
-import com.sun.spot.util.IEEEAddress;
 
 /*
  * The startApp method of this class is called by the VM to start the
@@ -60,6 +58,7 @@ public class SunSpotApplication extends MIDlet {
         scheduler = new Scheduler(1, .1);
         scheduler.addMachine(transmitter = new Transmitter());
         scheduler.addMachine(receiver = new Receiver());
+        SwitchEvent.addScheduler(scheduler);
         scheduler.run();
     }
     

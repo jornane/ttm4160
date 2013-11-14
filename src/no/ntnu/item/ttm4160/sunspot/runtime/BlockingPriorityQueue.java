@@ -67,7 +67,7 @@ public class BlockingPriorityQueue {
 	 * @param priority	priority of the object,
 	 * 		0 is minimal and maxPriority from the constructor is maximal
 	 */
-	public void push(Object obj, int priority) {
+	public synchronized void push(Object obj, int priority) {
 		queue[priority].addElement(obj);
 		notifyAll();
 	}

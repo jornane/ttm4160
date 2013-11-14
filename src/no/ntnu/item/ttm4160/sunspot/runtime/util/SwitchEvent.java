@@ -5,7 +5,6 @@ import java.util.Vector;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 
-import com.sun.spot.peripheral.SpotFatalException;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
 import com.sun.spot.sensorboard.peripheral.ISwitchListener;
@@ -14,33 +13,31 @@ public final class SwitchEvent extends Event {
 
 	public static class SwitchListener implements ISwitchListener {
 
+		private int button;
+
+		public SwitchListener(int button) {
+			this.button = button;
+		}
+
 		/**
 		 * Schedule a SwitchEvent for the pressed
 		 */
 		public void switchPressed(ISwitch s) {
-			for(int button=0;button<switches.length;button++)
-				if (switches[button] == s) {
-					for(int i=0;i<schedulers.size();i++)
-						((Scheduler)schedulers.elementAt(i)).pushEventHappened(new SwitchEvent(button+1), 0);
-					return;
-				}
-			throw new IllegalArgumentException("Received event from switch not in EDemoBoard");
+			for(int i=0;i<schedulers.size();i++) {
+				((Scheduler)schedulers.elementAt(i)).pushEventHappened(new SwitchEvent(button), 0);
+			}
 		}
 
 		public void switchReleased(ISwitch arg0) {/* do nothing */}
 	}
 
 	private static ISwitch[] switches;
-	private static Vector schedulers;
+	private static Vector schedulers = new Vector();
 
 	static {
-		try {
 		switches = EDemoBoard.getInstance().getSwitches();
 		for(int i=0;i<switches.length;i++)
-			switches[i].addISwitchListener(new SwitchListener());
-		} catch (SpotFatalException e) {
-			switches = new ISwitch[2];
-		}
+			switches[i].addISwitchListener(new SwitchListener(i+1));
 	}
 	
 	/**

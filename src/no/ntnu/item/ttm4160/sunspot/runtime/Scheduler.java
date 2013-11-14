@@ -6,12 +6,13 @@ import java.util.Vector;
 
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
-import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayerListener;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
 
 import com.sun.spot.peripheral.Spot;
 import com.sun.spot.peripheral.SpotFatalException;
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
 import com.sun.spot.util.IEEEAddress;
 
 public class Scheduler {
@@ -24,20 +25,7 @@ public class Scheduler {
 	private static ICommunicationLayer communications;
 	
 	static {
-		try {
-			communications = new Communications(getMacAddress());
-		} catch (RuntimeException e) {
-			communications = new ICommunicationLayer() {
-				
-				public void sendRemoteMessage(Message msg) {
-					System.out.println(msg);
-				}
-				
-				public void registerListener(ICommunicationLayerListener listener) {
-					
-				}
-			};
-		}
+		communications = new Communications(getMacAddress());
 	}
 
 	/**
@@ -85,13 +73,10 @@ public class Scheduler {
 		queue.clear();
 		while(stateMachines.size() > 0) {
 			try {
-				Event event = (Event)queue.next();
-				StateMachine machine = null;
-				for(
-						Enumeration e=subscriptions.keys();
-						e.hasMoreElements();
-						machine=(StateMachine)e.nextElement()
-				) {
+				Event event = (Event) queue.next();
+				Enumeration e=subscriptions.keys();
+				while(e.hasMoreElements()) {
+					StateMachine machine = (StateMachine) e.nextElement();
 					Vector list = (Vector) subscriptions.get(machine);
 					for(int i=0;i<list.size();i++) {
 						if (event.isAlive() && ((IEventType) list.elementAt(i)).isInterestedIn(event)) {
