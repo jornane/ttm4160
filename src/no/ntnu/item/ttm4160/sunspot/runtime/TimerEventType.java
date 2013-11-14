@@ -2,13 +2,13 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 
 public class TimerEventType implements IEventType {
 
-	public final IStateMachine machine;
+	public final StateMachine machine;
 
 	/**
 	 * Create a new TimerEventType which matches on a state machine
 	 * @param machine	the machine to match
 	 */
-	public TimerEventType(IStateMachine machine) {
+	public TimerEventType(StateMachine machine) {
 		this.machine = machine;
 	}
 
