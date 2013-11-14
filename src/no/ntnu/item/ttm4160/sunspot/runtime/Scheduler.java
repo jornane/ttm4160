@@ -5,22 +5,39 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
+import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
+import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayerListener;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
 
 import com.sun.spot.peripheral.Spot;
+import com.sun.spot.peripheral.SpotFatalException;
 import com.sun.spot.util.IEEEAddress;
 
-public class Scheduler implements Runnable {
+public class Scheduler {
 
 	private final BlockingPriorityQueue queue;
 	private final Vector/*<IStateMachine>*/ stateMachines;
 	
 	private final Hashtable/*<IStateMachine,Vector<IEventType>>*/ subscriptions;
 	
-	private final static Communications communications;
+	private static ICommunicationLayer communications;
 	
 	static {
-		communications = new Communications(getMacAddress());
+		try {
+			communications = new Communications(getMacAddress());
+		} catch (RuntimeException e) {
+			communications = new ICommunicationLayer() {
+				
+				public void sendRemoteMessage(Message msg) {
+					System.out.println(msg);
+				}
+				
+				public void registerListener(ICommunicationLayerListener listener) {
+					
+				}
+			};
+		}
 	}
 
 	/**
@@ -28,7 +45,11 @@ public class Scheduler implements Runnable {
 	 * @return	the MAC address
 	 */
 	protected static String getMacAddress() {
-		return new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
+		try {
+			return new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
+		} catch (SpotFatalException e) {
+			return "000000";
+		}
 	}
 
 	/**
@@ -75,6 +96,7 @@ public class Scheduler implements Runnable {
 					for(int i=0;i<list.size();i++) {
 						if (event.isAlive() && ((IEventType) list.elementAt(i)).isInterestedIn(event)) {
 							fire(event, machine);
+							break;
 						}
 					}
 				}
@@ -130,7 +152,7 @@ public class Scheduler implements Runnable {
 	 * @param event	the event to push
 	 * @param priority	the priority of the event
 	 */
-	void pushEventHappened(Event event, int priority) {
+	public void pushEventHappened(Event event, int priority) {
 		queue.push(event, priority);
 	}
 
@@ -141,6 +163,7 @@ public class Scheduler implements Runnable {
 	public void addMachine(StateMachine machine) {
 		stateMachines.addElement(machine);
 		subscriptions.put(machine, new Vector());
+		fire(null, machine);
 	}
 
 }

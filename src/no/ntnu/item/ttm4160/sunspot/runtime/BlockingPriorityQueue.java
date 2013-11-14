@@ -37,7 +37,7 @@ public class BlockingPriorityQueue {
 	 * @return the next object from the queue
 	 * @throws InterruptedException if thread was interrupted during blocking
 	 */
-	public Object next() throws InterruptedException {
+	public synchronized Object next() throws InterruptedException {
 		while(true) {
 			Object result = peek();
 			if (result != null)

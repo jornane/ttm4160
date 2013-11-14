@@ -5,6 +5,12 @@ package no.ntnu.item.ttm4160.example;
 
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.*;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEventType;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEventType;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEventType;
 
 /**
  * @author yorn
@@ -43,7 +49,9 @@ public class Transmitter extends StateMachine {
      * @see no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine#fire(no.ntnu.item.ttm4160.sunspot.runtime.Event, no.ntnu.item.ttm4160.sunspot.runtime.Scheduler)
      */
 	public Action fire(Event event, Scheduler scheduler) {
-
+		if(state == null) {
+			fireOnInit(event, scheduler);
+		}
         if(state.toString().equals("READY")){
             fireOnStateReady(event, scheduler);
         }
@@ -55,6 +63,10 @@ public class Transmitter extends StateMachine {
         }
 
 
+        if (event == null) {
+        	state = State.READY;
+            return Action.EXECUTE_TRANSITION;
+        }
         if(event instanceof MessageEvent&& ((MessageEvent)event).message.getContent().equals(Message.CanYouDisplayMyReadings)){
             super.sendMessage(scheduler, ((MessageEvent) event).message.getReceiver(), Message.Denied);
             return Action.EXECUTE_TRANSITION;
@@ -62,7 +74,13 @@ public class Transmitter extends StateMachine {
         }
 		return Action.DISCARD_EVENT;
 	}
-    private Action fireOnStateReady(Event event, Scheduler scheduler){
+    private void fireOnInit(Event event, Scheduler scheduler2) {
+		scheduler.subscribe(this, new SwitchEventType(1));
+		scheduler.subscribe(this, new SwitchEventType(2));
+		scheduler.subscribe(this, new MessageEventType(this.toString()));
+		scheduler.subscribe(this, new TimerEventType(this));
+	}
+	private Action fireOnStateReady(Event event, Scheduler scheduler){
         if (event instanceof SwitchEvent /*Needs check for right button*/){
             startTimer(500);
             super.sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);

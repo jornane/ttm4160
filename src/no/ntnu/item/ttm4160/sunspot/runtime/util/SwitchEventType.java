@@ -1,4 +1,9 @@
-package no.ntnu.item.ttm4160.sunspot.runtime;
+package no.ntnu.item.ttm4160.sunspot.runtime.util;
+
+import no.ntnu.item.ttm4160.sunspot.runtime.Event;
+import no.ntnu.item.ttm4160.sunspot.runtime.IEventType;
+
+
 
 public class SwitchEventType implements IEventType {
 

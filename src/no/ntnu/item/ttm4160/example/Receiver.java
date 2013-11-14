@@ -8,13 +8,14 @@ import com.sun.spot.util.Utils;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
-import no.ntnu.item.ttm4160.sunspot.runtime.MessageEvent;
-import no.ntnu.item.ttm4160.sunspot.runtime.MessageEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
-import no.ntnu.item.ttm4160.sunspot.runtime.SwitchEvent;
-import no.ntnu.item.ttm4160.sunspot.runtime.SwitchEventType;
-import no.ntnu.item.ttm4160.sunspot.runtime.TimerEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEventType;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEventType;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEventType;
 
 public class Receiver extends StateMachine {
 
@@ -48,6 +49,8 @@ public class Receiver extends StateMachine {
 	public Action fireOnInit(Event event, Scheduler scheduler) {
 			scheduler.subscribe(this, new SwitchEventType(2));
 			scheduler.subscribe(this, MessageEventType.BROADCAST);
+			scheduler.subscribe(this, new MessageEventType(this.toString()));
+			scheduler.subscribe(this, new TimerEventType(this));
 			state = State.FREE;
 			return Action.EXECUTE_TRANSITION;
 	}

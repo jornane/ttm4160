@@ -1,7 +1,11 @@
-package no.ntnu.item.ttm4160.sunspot.runtime;
+package no.ntnu.item.ttm4160.sunspot.runtime.util;
 
 import java.util.Vector;
 
+import no.ntnu.item.ttm4160.sunspot.runtime.Event;
+import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+
+import com.sun.spot.peripheral.SpotFatalException;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
 import com.sun.spot.sensorboard.peripheral.ISwitchListener;
@@ -30,9 +34,13 @@ public final class SwitchEvent extends Event {
 	private static Vector schedulers;
 
 	static {
+		try {
 		switches = EDemoBoard.getInstance().getSwitches();
 		for(int i=0;i<switches.length;i++)
 			switches[i].addISwitchListener(new SwitchListener());
+		} catch (SpotFatalException e) {
+			switches = new ISwitch[2];
+		}
 	}
 	
 	/**

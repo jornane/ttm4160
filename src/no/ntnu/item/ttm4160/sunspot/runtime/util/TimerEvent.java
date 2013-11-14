@@ -1,7 +1,11 @@
-package no.ntnu.item.ttm4160.sunspot.runtime;
+package no.ntnu.item.ttm4160.sunspot.runtime.util;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import no.ntnu.item.ttm4160.sunspot.runtime.Event;
+import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
 
 public class TimerEvent extends Event {
 
