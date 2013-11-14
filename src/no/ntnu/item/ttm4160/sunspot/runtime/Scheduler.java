@@ -4,11 +4,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.sun.spot.peripheral.Spot;
-import com.sun.spot.util.IEEEAddress;
-
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
+
+import com.sun.spot.peripheral.Spot;
+import com.sun.spot.util.IEEEAddress;
 
 public class Scheduler implements Runnable {
 
