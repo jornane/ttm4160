@@ -62,7 +62,7 @@ public class Transmitter extends StateMachine {
             return Action.EXECUTE_TRANSITION;
         }
         if(event instanceof MessageEvent&& ((MessageEvent)event).message.getContent().equals(Message.CanYouDisplayMyReadings)){
-            super.sendMessage(scheduler, ((MessageEvent) event).message.getReceiver(), Message.Denied);
+            sendMessage(scheduler, ((MessageEvent) event).message.getReceiver(), Message.Denied);
             return Action.EXECUTE_TRANSITION;
 
         }
@@ -71,13 +71,14 @@ public class Transmitter extends StateMachine {
     private void fireOnInit(Event event, Scheduler scheduler) {
 		scheduler.subscribe(this, new SwitchEventType(1));
 		scheduler.subscribe(this, new SwitchEventType(2));
-		scheduler.subscribe(this, new MessageEventType(this.toString()));
+		scheduler.subscribe(this, new MessageEventType(this.getName()));
 		scheduler.subscribe(this, new TimerEventType(this));
 	}
 	private Action fireOnStateReady(Event event, Scheduler scheduler){
         if (event instanceof SwitchEvent /*Needs check for right button*/){
-            startTimer(scheduler, 500);
-            super.sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
+            TimerEvent timer = new TimerEvent(this, scheduler, 500);
+            currentTimer = timer;
+            sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
             state = State.WAIT_RESPONSE;
             return Action.EXECUTE_TRANSITION;
         }
@@ -88,7 +89,8 @@ public class Transmitter extends StateMachine {
         if(event instanceof MessageEvent){
             if(((MessageEvent) event).message.getContent().equals(Message.ICanDisplayReadings)){
                 sendMessage(scheduler, ((MessageEvent) event).message.getSender(), Message.Approved);
-                startTimer(scheduler, 100);
+                TimerEvent timer = new TimerEvent(this, scheduler, 100);
+                currentTimer = timer;
                 lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
                 state = State.SENDING;
                 return Action.EXECUTE_TRANSITION;
@@ -116,7 +118,7 @@ public class Transmitter extends StateMachine {
 
         }
         else if(event instanceof SwitchEvent /*TODO check for right button id*/){
-            super.sendMessage(scheduler, lightReadingsReceiver, Message.SenderDisconnect);
+            sendMessage(scheduler, lightReadingsReceiver, Message.SenderDisconnect);
             currentTimer.cancel();
             state = State.READY;
             return Action.EXECUTE_TRANSITION;
@@ -133,7 +135,7 @@ public class Transmitter extends StateMachine {
             e.printStackTrace();
         }
 
-        super.sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
+        sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
     }
 
     private void blink() {
@@ -151,9 +153,5 @@ public class Transmitter extends StateMachine {
         }
     }
 
-    private void startTimer(Scheduler scheduler, long delay) {
-        Event timer = new TimerEvent(this, scheduler, delay);
-        //start Timer
-        this.currentTimer = (TimerEvent)timer;
-    }
+
 }
