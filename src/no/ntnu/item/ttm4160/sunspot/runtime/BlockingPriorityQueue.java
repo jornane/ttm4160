@@ -37,12 +37,14 @@ public class BlockingPriorityQueue {
 	 * @return the next object from the queue
 	 * @throws InterruptedException if thread was interrupted during blocking
 	 */
-	public synchronized Object next() throws InterruptedException {
-		while(true) {
-			Object result = peek();
-			if (result != null)
-				return result;
-			wait();
+	public Object next() throws InterruptedException {
+		synchronized(this) {
+			while(true) {
+				Object result = peek();
+				if (result != null)
+					return result;
+				wait();
+			}
 		}
 	}
 	
@@ -52,13 +54,15 @@ public class BlockingPriorityQueue {
 	 * For blocking, use #next()
 	 * @return the next object from the queue
 	 */
-	public synchronized Object peek() {
-		for(int i=getMaxPriority();i>=0;i--) {
-			double number = random.nextDouble();
-			if (!queue[i].empty() && number >= fairness)
-				return queue[i].pop();
+	public Object peek() {
+		synchronized(this) {
+			for(int i=getMaxPriority();i>=0;i--) {
+				double number = random.nextDouble();
+				if (!queue[i].empty() && number >= fairness)
+					return queue[i].pop();
+			}
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -67,9 +71,11 @@ public class BlockingPriorityQueue {
 	 * @param priority	priority of the object,
 	 * 		0 is minimal and maxPriority from the constructor is maximal
 	 */
-	public synchronized void push(Object obj, int priority) {
-		queue[priority].addElement(obj);
-		notifyAll();
+	public void push(Object obj, int priority) {
+		synchronized(this) {
+			queue[priority].addElement(obj);
+			notifyAll();
+		}
 	}
 	
 	/**
