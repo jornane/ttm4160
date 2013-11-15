@@ -24,7 +24,6 @@ public class TimerEvent extends Event {
 		 */
 		public void run() {
 			scheduler.pushEventHappened(event, scheduler.getMaxPriority());
-			event.cancel(); // ensure the event fires only once
 		}
 		
 	}
