@@ -76,8 +76,8 @@ public class Receiver extends StateMachine {
 	public Action fireOnWaitApproved(Event event, Scheduler scheduler) {
 		if (event instanceof MessageEvent) {
 			MessageEvent messageEvent = (MessageEvent) event;
-				timer = TimerEvent.schedule(this, scheduler, 5000);
 			if (Message.Approved.equals(messageEvent.message.getContent())) {
+				timer = TimerEvent.schedule(this, scheduler, 5000);
 				prepareLEDsForBusy();
 				state = State.BUSY;
 				return Action.EXECUTE_TRANSITION;
@@ -146,6 +146,11 @@ public class Receiver extends StateMachine {
 		for(int i=0;i<leds.length;i++) {
 			leds[i].setOff();
 		}
+	}
+
+	public String getState() {
+		// TODO Auto-generated method stub
+		return state.toString();
 	}
 
 }
