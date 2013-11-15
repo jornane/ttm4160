@@ -84,7 +84,6 @@ public class Receiver extends StateMachine {
 			}
 			else if (Message.Denied.equals(messageEvent.message.getContent())) {
 				state = State.FREE;
-				blink();
 				return Action.EXECUTE_TRANSITION;
 			}
 		}
@@ -103,7 +102,7 @@ public class Receiver extends StateMachine {
 				if (Message.SenderDisconnect.equals(messageEvent.message.getContent())) {
 					timer.cancel();
 					timer = null;
-					blink();
+					blink(LEDColor.PUCE);
 					state = State.FREE;
 					return Action.EXECUTE_TRANSITION;
 				}
@@ -115,7 +114,7 @@ public class Receiver extends StateMachine {
 						Message.ReceiverDisconnect
 					);
 				otherSpot = null;
-				blink();
+				blink(LEDColor.WHITE);
 				state = State.FREE;
 				return Action.EXECUTE_TRANSITION;
 			}
@@ -124,21 +123,6 @@ public class Receiver extends StateMachine {
 				return Action.EXECUTE_TRANSITION;
 			}
 			return Action.DISCARD_EVENT;
-	}
-
-	private void blink() {
-		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
-		for(int j=0;j<4;j++) {
-	        for (int i = 0; i < 8; i++) {
-	            leds[i].setColor(LEDColor.WHITE);
-	            leds[i].setOn(i%2==0);
-	        }
-	        Utils.sleep(200);
-	        for (int i = 0; i < 8; i++) {
-	            leds[i].setOn(i%2!=0);
-	        }
-	        Utils.sleep(200);
-		}
 	}
 
 	private void setLEDs(int lightLevel) {
