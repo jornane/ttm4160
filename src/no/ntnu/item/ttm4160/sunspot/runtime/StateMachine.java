@@ -1,5 +1,10 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.ITriColorLED;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
+import com.sun.spot.util.Utils;
+
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 
 public abstract class StateMachine {
@@ -41,6 +46,26 @@ public abstract class StateMachine {
 				recipient,
 				content
 			));
+	}
+	
+	public abstract String getState();
+
+	protected void blink(LEDColor color) {
+		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
+		for(int j=0;j<4;j++) {
+	        for (int i = 0; i < 8; i++) {
+	            leds[i].setColor(color);
+	            leds[i].setOn(i%2==0);
+	        }
+	        Utils.sleep(50);
+	        for (int i = 0; i < 8; i++) {
+	            leds[i].setOn(i%2!=0);
+	        }
+	        Utils.sleep(50);
+		}
+        for (int i = 0; i < 8; i++) {
+            leds[i].setOff();
+        }
 	}
 
 }
