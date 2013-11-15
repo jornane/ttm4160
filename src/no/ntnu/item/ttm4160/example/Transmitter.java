@@ -7,6 +7,7 @@ import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ITriColorLED;
 import com.sun.spot.sensorboard.peripheral.LEDColor;
 import com.sun.spot.util.Utils;
+
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
@@ -43,41 +44,39 @@ public class Transmitter extends StateMachine {
      * @see no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine#fire(no.ntnu.item.ttm4160.sunspot.runtime.Event, no.ntnu.item.ttm4160.sunspot.runtime.Scheduler)
      */
 	public Action fire(Event event, Scheduler scheduler) {
+		if(state == State.WAIT_RESPONSE){
+            return fireOnStateWaitResponse(event, scheduler);
+        }
+		if(event instanceof MessageEvent && ((MessageEvent)event).message.getContent().equals(Message.ICanDisplayReadings)){
+			return fireCatchICanDisplayReadings((MessageEvent) event, scheduler);
+		}
 		if(state == null) {
-			fireOnInit(event, scheduler);
+			return fireOnInit(event, scheduler);
 		}
         if(state == State.READY){
-            fireOnStateReady(event, scheduler);
+            return fireOnStateReady(event, scheduler);
         }
-        if(state == State.WAIT_RESPONSE){
-            fireOnStateWaitResponse(event, scheduler);
-        }
+        
         if(state == State.SENDING){
-            fireOnStateSending(event, scheduler);
+            return fireOnStateSending(event, scheduler);
         }
-
-
-        if (event == null) {
-        	state = State.READY;
-            return Action.EXECUTE_TRANSITION;
-        }
-        if(event instanceof MessageEvent&& ((MessageEvent)event).message.getContent().equals(Message.CanYouDisplayMyReadings)){
-            sendMessage(scheduler, ((MessageEvent) event).message.getReceiver(), Message.Denied);
-            return Action.EXECUTE_TRANSITION;
-
-        }
-		return Action.DISCARD_EVENT;
+		throw new IllegalStateException(state.toString());
 	}
-    private void fireOnInit(Event event, Scheduler scheduler) {
+    private Action fireCatchICanDisplayReadings(MessageEvent event, Scheduler scheduler) {
+		sendMessage(scheduler, event.message.getSender(), Message.Denied);
+		return Action.EXECUTE_TRANSITION;
+	}
+	private Action fireOnInit(Event event, Scheduler scheduler) {
 		scheduler.subscribe(this, new SwitchEventType(1));
 		scheduler.subscribe(this, new SwitchEventType(2));
 		scheduler.subscribe(this, new MessageEventType(this.getName()));
 		scheduler.subscribe(this, new TimerEventType(this));
+		state = State.READY;
+		return Action.EXECUTE_TRANSITION;
 	}
 	private Action fireOnStateReady(Event event, Scheduler scheduler){
         if (event instanceof SwitchEvent && ((SwitchEvent)event).button == 1){
-            TimerEvent timer = TimerEvent.schedule(this, scheduler, 500);
-            currentTimer = timer;
+            currentTimer = TimerEvent.schedule(this, scheduler, 500);
             sendMessage(scheduler, Message.BROADCAST_ADDRESS, Message.CanYouDisplayMyReadings);
             state = State.WAIT_RESPONSE;
             return Action.EXECUTE_TRANSITION;
@@ -92,33 +91,35 @@ public class Transmitter extends StateMachine {
                 if (currentTimer != null)
                 	currentTimer.cancel();
                 currentTimer = TimerEvent.schedule(this, scheduler, 100);
-                lightReadingsReceiver = ((MessageEvent) event).message.getReceiver();
+                lightReadingsReceiver = ((MessageEvent) event).message.getSender();
                 state = State.SENDING;
                 return Action.EXECUTE_TRANSITION;
             }
         }
         else if(event instanceof TimerEvent){
-            blink();
+            blink(LEDColor.RED);
             state = State.READY;
             return Action.EXECUTE_TRANSITION;
         }
         return Action.DISCARD_EVENT;
     }
     private Action fireOnStateSending(Event event, Scheduler scheduler){
-        if(event instanceof TimerEvent ){
+        if(event instanceof TimerEvent){
             if (currentTimer != null)
             	currentTimer.cancel();
-            currentTimer = TimerEvent.schedule(this, scheduler,100);;
-            sendLightReadings(scheduler);
+           	sendLightReadings(scheduler);
+            currentTimer = TimerEvent.schedule(this, scheduler, 100);
             return Action.EXECUTE_TRANSITION;
         }
         else if(event instanceof MessageEvent && ((MessageEvent) event).message.getContent().equals(Message.ReceiverDisconnect)){
+        	blink(LEDColor.WHITE);
             currentTimer.cancel();
             state = State.READY;
             return Action.EXECUTE_TRANSITION;
 
         }
         else if(event instanceof SwitchEvent && ((SwitchEvent)event).button == 2){
+            blink(LEDColor.WHITE);
             sendMessage(scheduler, lightReadingsReceiver, Message.SenderDisconnect);
             currentTimer.cancel();
             state = State.READY;
@@ -131,7 +132,7 @@ public class Transmitter extends StateMachine {
     private void sendLightReadings(Scheduler scheduler) {
         int lightReadings = -1;
         try {
-            lightReadings = EDemoBoard.getInstance().getLightSensor().getAverageValue();
+            lightReadings = EDemoBoard.getInstance().getLightSensor().getValue();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -139,20 +140,9 @@ public class Transmitter extends StateMachine {
         sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
     }
 
-    private void blink() {
-        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
-        for(int j=0;j<4;j++) {
-            for (int i = 0; i < 8; i++) {
-                leds[i].setColor(LEDColor.WHITE);
-                leds[i].setOn(i%2==0);
-            }
-            Utils.sleep(200);
-            for (int i = 0; i < 8; i++) {
-                leds[i].setOn(i%2!=0);
-            }
-            Utils.sleep(200);
-        }
-    }
+	public String getState() {
+		return state.toString();
+	}
 
 
 }
