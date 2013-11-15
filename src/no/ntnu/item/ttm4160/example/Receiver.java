@@ -129,16 +129,22 @@ public class Receiver extends StateMachine {
 		if (lightLevel > maxObservedLight)
 			maxObservedLight = lightLevel;
 		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
-		int amount = (int)(leds.length * lightLevel / (double) maxObservedLight);
-		for(int i=0;i<leds.length;i++)
+		double percent = lightLevel / (double) maxObservedLight;
+		int amount = (int)(leds.length * percent);
+		for(int i=0;i<leds.length;i++) {
+			if (i == amount) {
+				int rest = (int) ((percent * leds.length * 255) % 255);
+				leds[i].setRGB(rest, rest, rest);
+			} else
+				leds[i].setColor(LEDColor.WHITE);
 			leds[i].setOn(i <= amount);
+		}
 	}
 
 	private void prepareLEDsForBusy() {
 		ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
 		for(int i=0;i<leds.length;i++) {
 			leds[i].setOff();
-			leds[i].setColor(LEDColor.WHITE);
 		}
 	}
 
