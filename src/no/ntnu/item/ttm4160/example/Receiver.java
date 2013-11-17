@@ -10,8 +10,8 @@ import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
-import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
-import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEventType;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEvent;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEvent;
@@ -48,16 +48,16 @@ public class Receiver extends StateMachine {
 	
 	public Action fireOnInit(Event event, Scheduler scheduler) {
 			scheduler.subscribe(this, new SwitchEventType(2));
-			scheduler.subscribe(this, MessageEventType.BROADCAST);
-			scheduler.subscribe(this, new MessageEventType(this.getName()));
+			scheduler.subscribe(this, LocalMessageEventType.BROADCAST);
+			scheduler.subscribe(this, new LocalMessageEventType(this));
 			scheduler.subscribe(this, new TimerEventType(this));
 			state = State.FREE;
 			return Action.EXECUTE_TRANSITION;
 	}
 	
 	public Action fireOnFree(Event event, Scheduler scheduler) {
-			if (event instanceof MessageEvent) {
-				MessageEvent messageEvent = (MessageEvent) event;
+			if (event instanceof LocalMessageEvent) {
+				LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 				if (Message.BROADCAST_ADDRESS.equals(messageEvent.message.getReceiver())) {
 					otherSpot = messageEvent.message.getSender();
 					sendMessage(
@@ -74,8 +74,8 @@ public class Receiver extends StateMachine {
 	}
 	
 	public Action fireOnWaitApproved(Event event, Scheduler scheduler) {
-		if (event instanceof MessageEvent) {
-			MessageEvent messageEvent = (MessageEvent) event;
+		if (event instanceof LocalMessageEvent) {
+			LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 			if (Message.Approved.equals(messageEvent.message.getContent())) {
 				timer = TimerEvent.schedule(this, scheduler, 5000);
 				prepareLEDsForBusy();
@@ -91,8 +91,8 @@ public class Receiver extends StateMachine {
 	}
 	
 	public Action fireOnBusy(Event event, Scheduler scheduler) {
-			if (event instanceof MessageEvent) {
-				MessageEvent messageEvent = (MessageEvent) event;
+			if (event instanceof LocalMessageEvent) {
+				LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 				if (messageEvent.message.getContent().startsWith(Message.Reading)) {
 					int result = Integer.parseInt(messageEvent.message.getContent().substring(Message.Reading.length()));
 					setLEDs(result);
