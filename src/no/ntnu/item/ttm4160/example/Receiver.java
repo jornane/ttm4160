@@ -139,10 +139,11 @@ public class Receiver extends CommunicatingStateMachine {
 		for(int i=0;i<leds.length;i++) {
 			if (i == amount) {
 				int rest = (int) ((percent * leds.length * 255) % 255);
-				leds[i].setRGB(rest, rest, rest);
-			} else
+				leds[i].setRGB(rest, rest, i == 0 ? 255 : rest);
+			} else {
+				leds[i].setOn(i <= amount);
 				leds[i].setColor(LEDColor.WHITE);
-			leds[i].setOn(i <= amount);
+			}
 		}
 	}
 
