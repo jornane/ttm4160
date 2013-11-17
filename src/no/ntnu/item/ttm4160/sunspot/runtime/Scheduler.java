@@ -79,7 +79,7 @@ public class Scheduler {
 					StateMachine machine = (StateMachine) e.nextElement();
 					Vector list = (Vector) subscriptions.get(machine);
 					for(int i=0;i<list.size();i++) {
-						if (event.isAlive() && ((IEventType) list.elementAt(i)).isInterestedIn(event)) {
+						if (event.isAlive() && ((IEventType) list.elementAt(i)).matches(event)) {
 							fire(event, machine);
 							break;
 						}
