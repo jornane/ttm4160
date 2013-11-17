@@ -20,7 +20,7 @@ public class SwitchEventType implements IEventType {
 		this.button = button;
 	}
 
-	public boolean isInterestedIn(Event event) {
+	public boolean matches(Event event) {
 		return event instanceof SwitchEvent && ((SwitchEvent)event).button == button;
 	}
 

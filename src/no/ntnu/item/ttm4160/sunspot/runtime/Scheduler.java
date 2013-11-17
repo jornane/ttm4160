@@ -4,41 +4,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import no.ntnu.item.ttm4160.sunspot.communication.Communications;
-import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
-import no.ntnu.item.ttm4160.sunspot.communication.Message;
-import no.ntnu.item.ttm4160.sunspot.runtime.util.MessageEvent;
+public class Scheduler implements IScheduler {
 
-import com.sun.spot.peripheral.Spot;
-import com.sun.spot.peripheral.SpotFatalException;
-import com.sun.spot.sensorboard.EDemoBoard;
-import com.sun.spot.sensorboard.peripheral.LEDColor;
-import com.sun.spot.util.IEEEAddress;
-
-public class Scheduler {
-
-	private final BlockingPriorityQueue queue;
-	private final Vector/*<IStateMachine>*/ stateMachines;
-	
+	private final BlockingPriorityQueue/*<Event>*/ queue;
 	private final Hashtable/*<IStateMachine,Vector<IEventType>>*/ subscriptions;
-	
-	private static ICommunicationLayer communications;
-	
-	static {
-		communications = new Communications(getMacAddress());
-	}
-
-	/**
-	 * Get the MAC address of the current hardware
-	 * @return	the MAC address
-	 */
-	protected static String getMacAddress() {
-		try {
-			return new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
-		} catch (SpotFatalException e) {
-			return "000000";
-		}
-	}
+	private final Hashtable/*<IStateMachine,Vector<DeferredEvent>>*/ save;
 
 	/**
 	 * Construct a scheduler
@@ -46,11 +16,10 @@ public class Scheduler {
 	 */
 	public Scheduler(int maxPriority) {
 		queue = new BlockingPriorityQueue(maxPriority);
-		stateMachines = new Vector();
 		subscriptions = new Hashtable();
-		communications.registerListener(new MessageEvent.Listener(this));
+		save = new Hashtable();
 	}
-	
+
 	/**
 	 * Construct a fair scheduler
 	 * @param maxPriority	the maximum priority
@@ -58,9 +27,8 @@ public class Scheduler {
 	 */
 	public Scheduler(int maxPriority, double fairness) {
 		queue = new BlockingPriorityQueue(maxPriority, fairness);
-		stateMachines = new Vector();
 		subscriptions = new Hashtable();
-		communications.registerListener(new MessageEvent.Listener(this));
+		save = new Hashtable();
 	}
 
 	/**
@@ -71,7 +39,7 @@ public class Scheduler {
 	 */
 	public void run() {
 		queue.clear();
-		while(stateMachines.size() > 0) {
+		while(subscriptions.size() > 0) {
 			try {
 				Event event = (Event) queue.nextBlock();
 				Enumeration e=subscriptions.keys();
@@ -90,22 +58,13 @@ public class Scheduler {
 			}
 		}
 	}
-
-	/**
-	 * Send a remote message to
-	 * @param message	the message
-	 */
-	public void sendMessage(Message message) {
-		communications.sendRemoteMessage(message);
-	}
 	
-	/**
-	 * Subscribe an event type for a state machine
-	 * @param machine	the state machine which is interested in a specified event type
-	 * @param type	the event type the state machine is interested in
-	 */
 	public void subscribe(StateMachine machine, IEventType type) {
 		((Vector)subscriptions.get(machine)).addElement(type);
+	}
+	
+	public void unsubscribe(StateMachine machine, IEventType type) {
+		((Vector)subscriptions.get(machine)).removeElement(type);
 	}
 
 	/**
@@ -115,29 +74,32 @@ public class Scheduler {
 	 */
 	private void fire(Event event, StateMachine machine) {
 		Action action = machine.fire(event, this);
-		if(action==Action.DISCARD_EVENT) {
+		if (action == Action.DISCARD_EVENT) {
 			System.err.println("Discarded Event: "+event);
-		} else if(action==Action.TERMINATE_SYSTEM) {
-			stateMachines.removeElement(machine);
+		} else if (action == Action.TERMINATE_SYSTEM) {
 			subscriptions.remove(machine);
 			System.err.println("Terminating machine "+machine);
+		} else if (action == Action.EXECUTE_TRANSITION) {
+			Vector/*<Event>*/ deferredEvents = ((Vector) save.get(machine));
+			if (deferredEvents != null && deferredEvents.size() > 0) {
+				synchronized(deferredEvents) {
+					for(int i=0;i<deferredEvents.size();i++) {
+						queue.push(
+								((DeferredEvent) deferredEvents.elementAt(i)).event, 
+								queue.getMaxPriority()
+							);
+					}
+					deferredEvents.removeAllElements();
+				}
+			}
 		}
 	}
 	
-	/**
-	 * Get the maximum priority of the queue
-	 * @return	the maximum priority
-	 */
 	public int getMaxPriority() {
 		return queue.getMaxPriority();
 	}
-	
-	/**
-	 * Push an event, this will usually make sure {@link #fire(Event, StateMachine)} is called shortly after.
-	 * @param event	the event to push
-	 * @param priority	the priority of the event
-	 */
-	public void pushEventHappened(Event event, int priority) {
+
+	public void eventHappened(Event event, int priority) {
 		queue.push(event, priority);
 	}
 
@@ -146,9 +108,9 @@ public class Scheduler {
 	 * @param machine	the machine to add
 	 */
 	public void addMachine(StateMachine machine) {
-		stateMachines.addElement(machine);
 		subscriptions.put(machine, new Vector());
 		fire(null, machine);
+		subscribe(machine, new DeferredEventType(machine));
 	}
 
 }

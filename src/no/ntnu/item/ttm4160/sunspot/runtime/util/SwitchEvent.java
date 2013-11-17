@@ -3,7 +3,7 @@ package no.ntnu.item.ttm4160.sunspot.runtime.util;
 import java.util.Vector;
 
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
-import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
@@ -13,7 +13,7 @@ public final class SwitchEvent extends Event {
 
 	public static class SwitchListener implements ISwitchListener {
 
-		private int button;
+		private final int button;
 
 		public SwitchListener(int button) {
 			this.button = button;
@@ -24,7 +24,7 @@ public final class SwitchEvent extends Event {
 		 */
 		public void switchPressed(ISwitch s) {
 			for(int i=0;i<schedulers.size();i++) {
-				((Scheduler)schedulers.elementAt(i)).pushEventHappened(new SwitchEvent(button), 0);
+				((IScheduler)schedulers.elementAt(i)).eventHappened(new SwitchEvent(button), 0);
 			}
 		}
 
@@ -44,7 +44,7 @@ public final class SwitchEvent extends Event {
 	 * Add a scheduler on which SwitchEvents get scheduled
 	 * @param scheduler	the scheduler to add
 	 */
-	public static void addScheduler(Scheduler scheduler) {
+	public static void addScheduler(IScheduler scheduler) {
 		schedulers.addElement(scheduler);
 	}
 

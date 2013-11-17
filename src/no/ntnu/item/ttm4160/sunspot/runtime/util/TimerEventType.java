@@ -18,7 +18,7 @@ public class TimerEventType implements IEventType {
 		this.machine = machine;
 	}
 
-	public boolean isInterestedIn(Event event) {
+	public boolean matches(Event event) {
 		return event instanceof TimerEvent && ((TimerEvent)event).machine == machine;
 	}
 	

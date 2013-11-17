@@ -26,12 +26,17 @@ package no.ntnu.item.ttm4160.sunspot;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import no.ntnu.item.ttm4160.example.CommunicatingStateMachine;
 import no.ntnu.item.ttm4160.example.Receiver;
 import no.ntnu.item.ttm4160.example.Transmitter;
+import no.ntnu.item.ttm4160.sunspot.communication.Communications;
+import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
 
 import com.sun.spot.util.BootloaderListener;
+import com.sun.spot.util.Utils;
 
 /*
  * The startApp method of this class is called by the VM to start the
@@ -43,8 +48,7 @@ import com.sun.spot.util.BootloaderListener;
 public class SunSpotApplication extends MIDlet {
 	
 	Scheduler scheduler;
-	private Transmitter transmitter;
-	private Receiver receiver;
+	ICommunicationLayer communications;
 	
 	
     protected void startApp() throws MIDletStateChangeException {
@@ -56,12 +60,16 @@ public class SunSpotApplication extends MIDlet {
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
         scheduler = new Scheduler(1, .1);
-        scheduler.addMachine(transmitter = new Transmitter());
-        scheduler.addMachine(receiver = new Receiver());
+        Utils.sleep(1000);
+        communications = new Communications(CommunicatingStateMachine.getMacAddress());
+        
+        scheduler.addMachine(new Transmitter(communications));
+        scheduler.addMachine(new Receiver(communications));
         SwitchEvent.addScheduler(scheduler);
+        LocalMessageEvent.addScheduler(communications, scheduler);
         scheduler.run();
     }
-    
+
     
     
    

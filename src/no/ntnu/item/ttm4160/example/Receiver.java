@@ -1,15 +1,10 @@
 package no.ntnu.item.ttm4160.example;
 
-import com.sun.spot.sensorboard.EDemoBoard;
-import com.sun.spot.sensorboard.peripheral.ITriColorLED;
-import com.sun.spot.sensorboard.peripheral.LEDColor;
-import com.sun.spot.util.Utils;
-
+import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Action;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
-import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
-import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
+import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
@@ -17,7 +12,11 @@ import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEventType;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEventType;
 
-public class Receiver extends StateMachine {
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.ITriColorLED;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
+
+public class Receiver extends CommunicatingStateMachine {
 
 	private State state;
 	private TimerEvent timer;
@@ -30,10 +29,14 @@ public class Receiver extends StateMachine {
 		public State BUSY = new State(){public String toString(){return "BUSY";}};
 	}
 
+	public Receiver(ICommunicationLayer communications) {
+		super(communications);
+	}
+
 	/* (non-Javadoc)
 	 * @see no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine#fire(no.ntnu.item.ttm4160.sunspot.runtime.Event, no.ntnu.item.ttm4160.sunspot.runtime.Scheduler)
 	 */
-	public Action fire(Event event, Scheduler scheduler) {
+	public Action fire(Event event, IScheduler scheduler) {
 		State state = this.state; // concurrency
 		if (state == null)
 			return fireOnInit(event, scheduler);
@@ -46,7 +49,7 @@ public class Receiver extends StateMachine {
 		throw new IllegalStateException(state.toString());
 	}
 	
-	public Action fireOnInit(Event event, Scheduler scheduler) {
+	private Action fireOnInit(Event event, IScheduler scheduler) {
 			scheduler.subscribe(this, new SwitchEventType(2));
 			scheduler.subscribe(this, LocalMessageEventType.BROADCAST);
 			scheduler.subscribe(this, new LocalMessageEventType(this));
@@ -55,13 +58,12 @@ public class Receiver extends StateMachine {
 			return Action.EXECUTE_TRANSITION;
 	}
 	
-	public Action fireOnFree(Event event, Scheduler scheduler) {
+	private Action fireOnFree(Event event, IScheduler scheduler) {
 			if (event instanceof LocalMessageEvent) {
 				LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 				if (Message.BROADCAST_ADDRESS.equals(messageEvent.message.getReceiver())) {
 					otherSpot = messageEvent.message.getSender();
-					sendMessage(
-							scheduler, 
+					sendRemoteMessage(
 							otherSpot, 
 							Message.ICanDisplayReadings
 						);
@@ -73,7 +75,7 @@ public class Receiver extends StateMachine {
 			return Action.DISCARD_EVENT;
 	}
 	
-	public Action fireOnWaitApproved(Event event, Scheduler scheduler) {
+	private Action fireOnWaitApproved(Event event, IScheduler scheduler) {
 		if (event instanceof LocalMessageEvent) {
 			LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 			if (Message.Approved.equals(messageEvent.message.getContent())) {
@@ -90,7 +92,7 @@ public class Receiver extends StateMachine {
 		return Action.DISCARD_EVENT;
 	}
 	
-	public Action fireOnBusy(Event event, Scheduler scheduler) {
+	private Action fireOnBusy(Event event, IScheduler scheduler) {
 			if (event instanceof LocalMessageEvent) {
 				LocalMessageEvent messageEvent = (LocalMessageEvent) event;
 				if (messageEvent.message.getContent().startsWith(Message.Reading)) {
@@ -102,14 +104,14 @@ public class Receiver extends StateMachine {
 				if (Message.SenderDisconnect.equals(messageEvent.message.getContent())) {
 					timer.cancel();
 					timer = null;
-					blink(LEDColor.PUCE);
+					blink(LEDColor.WHITE);
 					state = State.FREE;
 					return Action.EXECUTE_TRANSITION;
 				}
 			}
 			if (event instanceof SwitchEvent && ((SwitchEvent)event).button == 2) {
 				timer.cancel();
-				sendMessage(scheduler,
+				sendRemoteMessage(
 						otherSpot,
 						Message.ReceiverDisconnect
 					);

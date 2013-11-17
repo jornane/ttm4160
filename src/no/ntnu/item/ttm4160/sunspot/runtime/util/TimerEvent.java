@@ -4,17 +4,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
-import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
 
 public class TimerEvent extends Event {
 
 	public static class TimerEventTimerTask extends TimerTask {
 
-		private Scheduler scheduler;
+		private IScheduler scheduler;
 		private TimerEvent event;
 
-		public TimerEventTimerTask(Scheduler scheduler, TimerEvent event) {
+		public TimerEventTimerTask(IScheduler scheduler, TimerEvent event) {
 			this.scheduler = scheduler;
 			this.event = event;
 		}
@@ -23,7 +23,7 @@ public class TimerEvent extends Event {
 		 * Schedules the enclosing event in the scheduler with the highest priority.
 		 */
 		public void run() {
-			scheduler.pushEventHappened(event, scheduler.getMaxPriority());
+			scheduler.eventHappened(event, scheduler.getMaxPriority());
 		}
 		
 	}
@@ -35,7 +35,7 @@ public class TimerEvent extends Event {
 	 */
 	public final StateMachine machine;
 
-	private final Scheduler scheduler;
+	private final IScheduler scheduler;
 	private final long delay;
 	
 	/**
@@ -46,7 +46,7 @@ public class TimerEvent extends Event {
 	 * @param scheduler	The scheduler of machine
 	 * @param delay	The amount of milliseconds to wait until the event fires
 	 */
-	public TimerEvent(StateMachine machine, Scheduler scheduler, long delay) {
+	public TimerEvent(StateMachine machine, IScheduler scheduler, long delay) {
 		this.machine = machine;
 		this.scheduler = scheduler;
 		this.delay = delay;
@@ -61,7 +61,7 @@ public class TimerEvent extends Event {
 	 * @param delay	The amount of milliseconds to wait until the event fires
 	 * @return	the newly created TimerEvent
 	 */
-	public static TimerEvent schedule(StateMachine machine, Scheduler scheduler, long delay) {
+	public static TimerEvent schedule(StateMachine machine, IScheduler scheduler, long delay) {
 		TimerEvent timerEvent = new TimerEvent(machine, scheduler, delay);
 		timerEvent.start();
 		return timerEvent;
