@@ -37,13 +37,19 @@ public class BlockingPriorityQueue {
 	 * @return the next object from the queue
 	 * @throws InterruptedException if thread was interrupted during blocking
 	 */
-	public Object next() throws InterruptedException {
+	public Object nextBlock() throws InterruptedException {
 		synchronized(this) {
+			byte pollCounter = 0;
 			while(true) {
-				Object result = peek();
+				Object result = next();
 				if (result != null)
 					return result;
-				wait();
+				for(int i=0;i<queue.length;i++)
+					if (!queue[i].empty())
+						continue;
+				wait(pollCounter < 12 ? (1 << pollCounter) << 4 : 0);
+				if (pollCounter > 0)
+					pollCounter++;
 			}
 		}
 	}
@@ -54,7 +60,7 @@ public class BlockingPriorityQueue {
 	 * For blocking, use #next()
 	 * @return the next object from the queue
 	 */
-	public Object peek() {
+	public Object next() {
 		synchronized(this) {
 			for(int i=getMaxPriority();i>=0;i--) {
 				double number = random.nextDouble();
@@ -91,8 +97,10 @@ public class BlockingPriorityQueue {
 	 * Make the queue empty.
 	 */
 	public void clear() {
-		for(int i=0;i<queue.length;i++)
-			queue[i].removeAllElements();
+		synchronized(queue) {
+			for(int i=0;i<queue.length;i++)
+				queue[i].removeAllElements();
+		}
 	}
 	
 }

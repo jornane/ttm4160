@@ -73,7 +73,7 @@ public class Scheduler {
 		queue.clear();
 		while(stateMachines.size() > 0) {
 			try {
-				Event event = (Event) queue.next();
+				Event event = (Event) queue.nextBlock();
 				Enumeration e=subscriptions.keys();
 				while(e.hasMoreElements()) {
 					StateMachine machine = (StateMachine) e.nextElement();
