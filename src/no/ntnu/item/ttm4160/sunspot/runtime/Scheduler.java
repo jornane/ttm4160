@@ -103,6 +103,19 @@ public class Scheduler implements IScheduler {
 		queue.push(event, priority);
 	}
 
+	public void defer(StateMachine machine, Event event) {
+		if (!save.containsKey(machine)) {
+			synchronized(save) {
+				if (!save.containsKey(machine))
+					save.put(machine, new Vector());
+			}
+		}
+		Vector/*<DeferredEvent>*/ deferredEvents = (Vector) save.get(machine);
+		synchronized(deferredEvents) {
+			deferredEvents.addElement(DeferredEvent.defer(machine, event));
+		}
+	}
+
 	/**
 	 * Add a state machine
 	 * @param machine	the machine to add

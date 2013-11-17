@@ -22,4 +22,11 @@ public interface IScheduler {
 	 */
 	void eventHappened(Event event, int priority);
 
+	/**
+	 * Schedule an event for fireing when the state machine changes state.
+	 * @param machine	the machine which deferred the event
+	 * @param event	the event
+	 */
+	void defer(StateMachine machine, Event event);
+
 }

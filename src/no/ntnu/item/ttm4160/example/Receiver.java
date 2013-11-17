@@ -88,6 +88,9 @@ public class Receiver extends CommunicatingStateMachine {
 				state = State.FREE;
 				return Action.EXECUTE_TRANSITION;
 			}
+			else if (Message.CanYouDisplayMyReadings.equals(messageEvent.message.getContent())) {
+				scheduler.defer(this, event);
+			}
 		}
 		return Action.DISCARD_EVENT;
 	}
