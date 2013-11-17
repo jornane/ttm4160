@@ -1,6 +1,3 @@
-/**
- * 
- */
 package no.ntnu.item.ttm4160.example;
 
 import com.sun.spot.sensorboard.EDemoBoard;
@@ -22,16 +19,11 @@ import no.ntnu.item.ttm4160.sunspot.runtime.util.TimerEventType;
 
 import java.io.IOException;
 
-/**
- * @author yorn
- *
- */
 public class Transmitter extends StateMachine {
 
     private State state;
     private String lightReadingsReceiver;
     private TimerEvent currentTimer;
-
 
     private interface State {
         public State READY = new State() {public String toString() {return"READY";}};
@@ -139,10 +131,5 @@ public class Transmitter extends StateMachine {
 
         sendMessage(scheduler, lightReadingsReceiver, Message.Reading + lightReadings);
     }
-
-	public String getState() {
-		return state.toString();
-	}
-
 
 }

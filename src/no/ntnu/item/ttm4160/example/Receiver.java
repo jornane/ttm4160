@@ -148,9 +148,4 @@ public class Receiver extends StateMachine {
 		}
 	}
 
-	public String getState() {
-		// TODO Auto-generated method stub
-		return state.toString();
-	}
-
 }
