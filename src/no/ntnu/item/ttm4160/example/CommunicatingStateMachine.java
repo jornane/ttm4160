@@ -23,11 +23,11 @@ public abstract class CommunicatingStateMachine extends StateMachine {
 		return new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
 	}
 	
-	public void sendRemoteMessage(Message msg) {
+	protected void sendRemoteMessage(Message msg) {
 		communications.sendRemoteMessage(msg);
 	}
 
-	public void sendRemoteMessage(String receiver, String content) {
+	protected void sendRemoteMessage(String receiver, String content) {
 		sendRemoteMessage(new Message(
 				getMacAddress()+":"+hashCode(), 
 				receiver, 

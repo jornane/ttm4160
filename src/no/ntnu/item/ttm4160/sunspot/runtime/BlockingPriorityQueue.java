@@ -3,7 +3,7 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 import java.util.Random;
 import java.util.Stack;
 
-public class BlockingPriorityQueue {
+final class BlockingPriorityQueue {
 
 	private final Stack[] queue;
 	private final double fairness;

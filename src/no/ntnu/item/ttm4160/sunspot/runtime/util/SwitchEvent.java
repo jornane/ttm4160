@@ -11,8 +11,7 @@ import com.sun.spot.sensorboard.peripheral.ISwitchListener;
 
 public final class SwitchEvent extends Event {
 
-	public static class SwitchListener implements ISwitchListener {
-
+	private static class SwitchListener implements ISwitchListener {
 		private final int button;
 
 		public SwitchListener(int button) {
@@ -62,7 +61,7 @@ public final class SwitchEvent extends Event {
 	 * Throws an exception if button number is out of bounds.
 	 * Does nothing if the number is valid. 
 	 */
-	public static void checkButtonNumber(int button) {
+	static void checkButtonNumber(int button) {
 		if (button < 1)
 			throw new IllegalArgumentException("Button number must be at least 1");
 		if (button > switches.length)

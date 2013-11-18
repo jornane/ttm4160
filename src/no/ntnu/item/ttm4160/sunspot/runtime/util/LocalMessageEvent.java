@@ -33,7 +33,7 @@ public class LocalMessageEvent extends Event {
      *
      * @param message is the message that's being sent
      */
-    private LocalMessageEvent(Message message){
+    public LocalMessageEvent(Message message){
         this.message = message;
     }
 

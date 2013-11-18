@@ -7,7 +7,7 @@ final class DeferredEventType implements IEventType {
 	/**
 	 * 
 	 */
-	public DeferredEventType(StateMachine machine) {
+	DeferredEventType(StateMachine machine) {
 		this.machine = machine;
 	}
 

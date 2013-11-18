@@ -9,7 +9,7 @@ import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
 
 public class TimerEvent extends Event {
 
-	public static class TimerEventTimerTask extends TimerTask {
+	private static class TimerEventTimerTask extends TimerTask {
 
 		private IScheduler scheduler;
 		private TimerEvent event;
@@ -46,7 +46,7 @@ public class TimerEvent extends Event {
 	 * @param scheduler	The scheduler of machine
 	 * @param delay	The amount of milliseconds to wait until the event fires
 	 */
-	public TimerEvent(StateMachine machine, IScheduler scheduler, long delay) {
+	private TimerEvent(StateMachine machine, IScheduler scheduler, long delay) {
 		this.machine = machine;
 		this.scheduler = scheduler;
 		this.delay = delay;
