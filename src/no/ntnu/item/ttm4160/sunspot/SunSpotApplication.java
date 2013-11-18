@@ -31,6 +31,7 @@ import no.ntnu.item.ttm4160.example.Receiver;
 import no.ntnu.item.ttm4160.example.Transmitter;
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
+import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.LocalMessageEvent;
 import no.ntnu.item.ttm4160.sunspot.runtime.util.SwitchEvent;
@@ -47,7 +48,7 @@ import com.sun.spot.util.Utils;
  */
 public class SunSpotApplication extends MIDlet {
 	
-	Scheduler scheduler;
+	IScheduler scheduler;
 	ICommunicationLayer communications;
 	
 	

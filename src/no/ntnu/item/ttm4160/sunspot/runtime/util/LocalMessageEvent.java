@@ -4,7 +4,7 @@ import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
 import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayerListener;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Event;
-import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 
 /**
  * Event for messages to state machines
@@ -12,9 +12,9 @@ import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 public class LocalMessageEvent extends Event {
     private static class Listener implements ICommunicationLayerListener {
 
-		private final Scheduler scheduler;
+		private final IScheduler scheduler;
 
-		public Listener(Scheduler scheduler) {
+		public Listener(IScheduler scheduler) {
 			this.scheduler = scheduler;
 		}
 
@@ -38,7 +38,7 @@ public class LocalMessageEvent extends Event {
     }
 
 	public static void addScheduler(ICommunicationLayer communications,
-			Scheduler scheduler) {
+			IScheduler scheduler) {
         communications.registerListener(new LocalMessageEvent.Listener(scheduler));
 	}
 
