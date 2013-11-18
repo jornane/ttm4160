@@ -8,6 +8,7 @@ import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
 
 public class TimerEventType implements IEventType {
 
+	/** The machine which should be notified when the timer expires */
 	public final StateMachine machine;
 
 	/**

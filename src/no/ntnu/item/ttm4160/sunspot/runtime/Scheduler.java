@@ -31,12 +31,6 @@ public class Scheduler implements IScheduler {
 		save = new Hashtable();
 	}
 
-	/**
-	 * Execute the scheduler.
-	 * Before this gets called,
-	 * at least one state machine must have been added.
-	 * The scheduler will terminate when there are no more state machines.
-	 */
 	public void run() {
 		queue.clear();
 		while(subscriptions.size() > 0) {
@@ -119,10 +113,6 @@ public class Scheduler implements IScheduler {
 		}
 	}
 
-	/**
-	 * Add a state machine
-	 * @param machine	the machine to add
-	 */
 	public void addMachine(StateMachine machine) {
 		subscriptions.put(machine, new Vector());
 		fire(null, machine);

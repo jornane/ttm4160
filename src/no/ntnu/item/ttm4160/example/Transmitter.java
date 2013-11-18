@@ -29,6 +29,16 @@ public class Transmitter extends CommunicatingStateMachine {
         public State SENDING = new State() {public String toString() {return"SENDING";}};
     }
 
+    /**
+     * Construct a new transmitter.
+     * The transmitter will wait until button 1 is pressed.
+     * It will then broadcast a message {@value Message#CanYouDisplayMyReadings},
+     * and wait until some state machine answers with {@value Message#ICanDisplayReadings}.
+     * It will then send readings with an interval, until it receives {@value Message#SenderDisconnect}
+     * or button 2 is pressed. 
+     * 
+     * @param communications	the handle for sending and receiving messages to another state machine
+     */
 	public Transmitter(ICommunicationLayer communications) {
 		super(communications);
 	}

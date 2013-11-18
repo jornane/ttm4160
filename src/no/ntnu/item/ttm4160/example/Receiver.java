@@ -29,6 +29,14 @@ public class Receiver extends CommunicatingStateMachine {
 		public State BUSY = new State(){public String toString(){return "BUSY";}};
 	}
 
+	/**
+	 * Construct a new receiver.
+	 * The receiver will wait until it receives a {@value Message#CanYouDisplayMyReadings} from another state machine.
+	 * When it does, it will reply with {@value Message#ICanDisplayReadings}.
+	 * If it then receives {@value Message#Approved}, it will listen for readings and display them using the LEDs of the hardware it runs on.
+	 * 
+     * @param communications	the handle for sending and receiving messages to another state machine
+	 */
 	public Receiver(ICommunicationLayer communications) {
 		super(communications);
 	}

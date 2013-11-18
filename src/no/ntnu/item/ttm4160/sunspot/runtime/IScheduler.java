@@ -3,11 +3,35 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 public interface IScheduler {
 
 	/**
-	 * Subscribe an event type for a state machine
+	 * Add a state machine to the scheduler.
+	 * This means the state machine will be considered to notify
+	 * using {@link StateMachine#fire(Event, IScheduler)}
+	 * when an event is received by the scheduler.
+	 * @param machine	the machine to add
+	 */
+	public void addMachine(StateMachine machine);
+	
+	/**
+	 * Execute the scheduler.
+	 * Before this gets called,
+	 * at least one state machine must have been added.
+	 * The scheduler will terminate when there are no more state machines.
+	 */
+	public void run();
+
+	/**
+	 * Subscribe (indicate interest for) an event type for a state machine
 	 * @param machine	the state machine which is interested in a specified event type
 	 * @param type	the event type the state machine is interested in
 	 */
 	void subscribe(StateMachine machine, IEventType type);
+
+	/**
+	 * Unsubscribe (remove interest for) an event type for a state machine
+	 * @param machine	the state machine which is no longer interested in a specified event type
+	 * @param type	the event type the state machine is no longer interested in
+	 */
+	void unsubscribe(StateMachine machine, IEventType type);
 
 	/**
 	 * Get the maximum priority of the queue

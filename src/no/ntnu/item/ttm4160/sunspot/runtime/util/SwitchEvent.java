@@ -9,6 +9,9 @@ import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
 import com.sun.spot.sensorboard.peripheral.ISwitchListener;
 
+/**
+ * Event which is scheduled when a hardware button (switch) is pressed.
+ */
 public final class SwitchEvent extends Event {
 
 	private static class SwitchListener implements ISwitchListener {
@@ -19,7 +22,7 @@ public final class SwitchEvent extends Event {
 		}
 
 		/**
-		 * Schedule a SwitchEvent for the pressed
+		 * Schedule a SwitchEvent for the pressed button.
 		 */
 		public void switchPressed(ISwitch s) {
 			for(int i=0;i<schedulers.size();i++) {
@@ -33,6 +36,9 @@ public final class SwitchEvent extends Event {
 	private static ISwitch[] switches;
 	private static Vector schedulers = new Vector();
 
+	/**
+	 * Store all available switches and add listeners to them.
+	 */
 	static {
 		switches = EDemoBoard.getInstance().getSwitches();
 		for(int i=0;i<switches.length;i++)

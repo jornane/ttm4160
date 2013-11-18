@@ -7,6 +7,10 @@ import no.ntnu.item.ttm4160.sunspot.runtime.Event;
 import no.ntnu.item.ttm4160.sunspot.runtime.IScheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.StateMachine;
 
+/**
+ * Event indicating that a previously set timer has expired.
+ * These events are fed to the scheduler with the highest priority.
+ */
 public class TimerEvent extends Event {
 
 	private static class TimerEventTimerTask extends TimerTask {

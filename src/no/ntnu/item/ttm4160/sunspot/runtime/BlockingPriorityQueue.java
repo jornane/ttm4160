@@ -33,7 +33,7 @@ final class BlockingPriorityQueue {
 	/**
 	 * Get the next object from the queue. Higher priority objects will be favoured.
 	 * This method will block until there is an object to return.
-	 * If this is undesired, use #peek()
+	 * If this is undesired, use #next()
 	 * @return the next object from the queue
 	 * @throws InterruptedException if thread was interrupted during blocking
 	 */
@@ -57,7 +57,7 @@ final class BlockingPriorityQueue {
 	/**
 	 * Get the next object from the queue. Higher priority objects will be favoured.
 	 * If there is no object to return, this method will return null. It will not block.
-	 * For blocking, use #next()
+	 * For blocking, use #nextBlock()
 	 * @return the next object from the queue
 	 */
 	public Object next() {
