@@ -40,7 +40,7 @@ public class Scheduler implements IScheduler {
 				while(e.hasMoreElements()) {
 					StateMachine machine = (StateMachine) e.nextElement();
 					Vector list = (Vector) subscriptions.get(machine);
-					for(int i=0;i<list.size();i++) {
+					if (list != null) for(int i=0;i<list.size();i++) {
 						if (event.isAlive() && ((IEventType) list.elementAt(i)).matches(event)) {
 							if (event instanceof DeferredEvent)
 								fire(((DeferredEvent) event).event, machine);
@@ -75,6 +75,7 @@ public class Scheduler implements IScheduler {
 			System.err.println("Discarded Event: "+event);
 		} else if (action == Action.TERMINATE_SYSTEM) {
 			subscriptions.remove(machine);
+			save.remove(machine);
 			System.err.println("Terminating machine "+machine);
 		} else if (action == Action.EXECUTE_TRANSITION) {
 			Vector/*<Event>*/ deferredEvents = ((Vector) save.get(machine));
