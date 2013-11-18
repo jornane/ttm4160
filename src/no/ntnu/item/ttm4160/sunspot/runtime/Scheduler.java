@@ -48,7 +48,10 @@ public class Scheduler implements IScheduler {
 					Vector list = (Vector) subscriptions.get(machine);
 					for(int i=0;i<list.size();i++) {
 						if (event.isAlive() && ((IEventType) list.elementAt(i)).matches(event)) {
-							fire(event, machine);
+							if (event instanceof DeferredEvent)
+								fire(((DeferredEvent) event).event, machine);
+							else
+								fire(event, machine);
 							break;
 						}
 					}
