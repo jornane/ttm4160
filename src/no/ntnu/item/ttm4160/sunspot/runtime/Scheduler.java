@@ -84,7 +84,7 @@ public class Scheduler implements IScheduler {
 					for(int i=0;i<deferredEvents.size();i++) {
 						queue.push(
 								((DeferredEvent) deferredEvents.elementAt(i)).event, 
-								queue.getMaxPriority()
+								queue.getMaxPriority() > 1 ? queue.getMaxPriority()-1 : 0 
 							);
 					}
 					deferredEvents.removeAllElements();
