@@ -1,5 +1,6 @@
 package no.ntnu.item.ttm4160.sunspot.runtime.util;
 
+import no.ntnu.item.ttm4160.example.CommunicatingStateMachine;
 import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayer;
 import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayerListener;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
