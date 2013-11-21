@@ -40,8 +40,8 @@ public class Scheduler implements IScheduler {
 				while(e.hasMoreElements()) {
 					StateMachine machine = (StateMachine) e.nextElement();
 					Vector list = (Vector) subscriptions.get(machine);
-					if (list != null) for(int i=0;i<list.size();i++) {
-						if (event.isAlive() && ((IEventType) list.elementAt(i)).matches(event)) {
+					if (list != null && event.isAlive()) for(int i=0;i<list.size();i++) {
+						if (((IEventType) list.elementAt(i)).matches(event)) {
 							if (event instanceof DeferredEvent)
 								fire(((DeferredEvent) event).event, machine);
 							else
